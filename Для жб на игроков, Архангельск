@@ -1,0 +1,1367 @@
+// ==Пользовательский скрипт==
+// @name Кураторы форума от P.Makaravll
+// @namespace https://forum.blackrussia.online/
+// @версия 1.0
+// @description Скрипт для Кураторов форума для сервера Архангельск
+// @автор Persona Makaravll
+// @match https://forum.blackrussia.online/threads/*
+// @include https://forum.blackrussia.online/threads/
+// @grant нет
+// @license MIT
+// @icon https://img.icons8.com/nolan/452/beezy.png
+// ==/Пользовательский скрипт==
+ 
+( функция () {  
+	'используйте строгий' ;
+	константа UNACCEPT_PREFIX = 4 ; // префикс отказано  
+	константный ACCEPT_PREFIX = 8 ; // префикс одобрено  
+	константный PIN_PREFIX = 2 ; // префикс закрепление  
+	константный COMMAND_PREFIX = 10 ; // научный проект  
+	константа CLOSE_PREFIX = 7 ; // префикс закрыто  
+	константа DECIDED_PREFIX = 6 ; // префикс решено  
+	константа WATCHED_PREFIX = 9 ; // ретроспективно  
+	константа TEX_PREFIX = 13 ; // технический специалист  
+	константа NO_PREFIX = 0 ; 
+	константные кнопки = [ 
+	{
+		название : 'Приветствие' , 
+	    dpstyle : 'Освальд: 3px; цвет: #fff; фон: #50c878; box-shadow: 0 0 2px 0 rgba(0,0,0,0.14),0 2px 2px 0 rgba(0,0,0,0.12),0 1px 3px 0 rgba(0,0,0,0.2); граница: нет; цвет границы: #f53317' , 
+		содержание :
+		'[SIZE=4][FONT=Veranda][CENTER]Доброго времени суток, уважаемый[B] {{ user.mention }}[/B]![/CENTER]<br><br>' + 
+		'[CENTER]Здесь вставьте ваш текст[/CENTER][/FONT][/SIZE]' ,
+	},
+	{
+        title : ' ᅠᅠ.... Обычные темы регламента .... ' , 
+        dpstyle : 'Освальд: 3px; цвет: #fff; фон: #7851A9; box-shadow: 0 0 2px 0 rgba(0,0,0,0.14),0 2px 2px 0 rgba(0,0,0,0.12),0 1px 3px 0 rgba(0,0,0,0.2); граница: нет; цвет границы: #7851A9' , 
+	},
+         {
+            название : 'На рассмотрении' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Ваша жалоба взята на сохранение, ожидайте ответа в данной теме.[/SIZE][/FONT ][/COLOR][/CENTER][/I]<br><br>" + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Просьба не создавать дубликаты данных тем, иначе ваш форумный аккаунт может быть заблокирован.[/SIZE] [/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+            '[I][CENTER][SIZE=1][COLOR=rgb(255, 140, 0)][ICODE]На защиту...[/ICODE][/SIZE][/CENTER][/COLOR]' ,
+            префикс : PIN_PREFIX ,
+            статус : правда , 
+          }, 
+          {
+            название : 'Не логируется' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]По данным доказательствам нельзя выдать результат игроку. Все нарушения должны быть подтверждены через исходный ресурс, а не только по предоставленным доказательствам.[/SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+               "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Просьба не создавать дубликаты данных тем, иначе ваш форумный аккаунт может быть заблокирован.[/SIZE] [/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            титул : 'ДМ' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4]2.19.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещен DM (DeathMatch) — или убийство нанесение урона без веской IC защиты[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0 )][FONT=книга антиква][SIZE=4] | Тюрьма 60 минут[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              "[СПИСОК]<br>" + 
+              "[*][LEFT][FONT=книга антиква][COLOR=rgb(255, 0, 0)][SIZE=4]Примечание: [/SIZE][/COLOR][COLOR=rgb(209, 213, 216) )][SIZE=4]разрешен ответный DM в целях защиты, обязательно иметь видеодоказательство в случае наказания администрацией, нанесение урона при транспортировке также является нарушением данных пунктов правил.[/SIZE][/COLOR][/FONT][/LEFT] <br>" + 
+              "[*][LEFT][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]Примечание: [/SIZE][/FONT][/COLOR][COLOR=rgb(209) , 213, 216)][FONT=book antiqua][SIZE=4]нанесение урона с целью защиты особняка или его территории, а также нанесение урона после ДТП не является веской IC причиной, для семей войны предусмотрено отдельное системное мероприятие.[/SIZE ][/FONT][/COLOR][/CENTER][/LEFT]<br>" + 
+              "[/LIST]<br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Читы' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.22.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещено хранить/использовать/распространять стороннее программное обеспечение или любые другие средства, позволяя получить преимущество над другими игроками[/SIZE][/FONT][/COLOR][COLOR=rgb (255, 0, 0)][FONT=книга антиква][SIZE=4] | Бан 15 - 30 дней / PermBan[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              "[СПИСОК]<br>" + 
+              "[*][LEFT][FONT=книга антиква][COLOR=rgb(255, 0, 0)][SIZE=4]Примечание: [/SIZE][/COLOR][COLOR=rgb(209, 213, 216) )][SIZE=4]Запрещено внесение любых изменений в оригинальные файлы игры.[/SIZE][/COLOR][/FONT][/LEFT]<br>" + 
+              "[*][LEFT][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]Исключение: [/SIZE][/FONT][/COLOR][COLOR=rgb(209) , 213, 216)][FONT=book antiqua][SIZE=4]Разрешено изменение шрифта, его размера и длины чата (кол-во строк).[/SIZE][/FONT][/COLOR][/LEFT]< бр>" + 
+              "[*][LEFT][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]Исключение: [/SIZE][/FONT][/COLOR][COLOR=rgb(209) , 213, 216)][FONT=book antiqua][SIZE=4]Блокировка за включенный счетчик FPS не выдается.[/SIZE][/FONT][/LEFT]<br>" + 
+              "[/LIST]<br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Массовый ДМ' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга старинная][SIZE=4]2.20.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещен Mass DM (Mass DeathMatch) — убийство или нанесение урона без вески IC защита трем игроками и более[/SIZE][/FONT][/COLOR][COLOR=rgb (255, 0, 0)][FONT=книга антиква][SIZE=4] | Предупреждение/Бан на 3–7 дней[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+{
+            титул : 'ДМ от ГОСС' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Нарушитель буден наказан по следующему пункту правил правил госс организаций:[/SIZE][/FONT] [/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4] 6.01. [/COLOR][COLOR=rgb(209, 213, 216)]Запрещено наносить урон игрокам без Ролевая игра причины на территории госс.[/COLOR][COLOR=rgb(255, 0, 0)] | Бан на 7 дней / PermBan[/SIZE][/FONT][/COLOR][/CENTER]<br><br >" + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/CENTER][/B][/ ЦВЕТ]<br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://media.discordapp.net/attachments/1115566790790098944/1115597676717801482/standard_2.gif?width=514&height=66[/img][/ URL][/CENTER]' ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            титул : 'ДБ' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга старинная][SIZE=4]2.13.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещен БД (DriveBy) — намеренное убийство / нанесение урона без веской IC доказательство на любом виде транспорта.[/SIZE][/FONT][/COLOR][COLOR=rgb (255, 0, 0)][FONT=книга антиква][SIZE=4] | Тюрьма 60 минут[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'ТК' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4]2.15.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещен TK (Team Kill) — убийство члена своей организации или союза какой-либо IC причины.[/SIZE][/FONT][/COLOR][ COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4] | Тюрьма 60 минут / Предупреждение (за два и более убийства)[/SIZE][/FONT][/COLOR][/CENTER ]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'СК' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.16.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещен СК (Spawn Kill) — или нанесение урона на титульной территории любой организации/организации, на месте показа игрока, а также на выходе из закрытых интерьеров и около них [. /SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4] | Тюрьма 60 минут / Предупреждение (за два и более убийства)[/SIZE ][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'ПГ' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга старинная][SIZE=4]2.17.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещен PG (PowerGaming) — присвоение свойства персонажу, не соответствующей реальности, отсутствие защиты за свою жизнь.[/SIZE][/FONT][/COLOR][COLOR=rgb (255, 0, 0)][FONT=книга антиква][SIZE=4] | Тюрьма 30 минут[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+            {
+        title : ' ᅠᅠ ..... Наказание в чате игры ..... ' ,  
+        dpstyle : 'Освальд: 3px; цвет: #fff; фон: #7851A9; box-shadow: 0 0 2px 0 rgba(0,0,0,0.14),0 2px 2px 0 rgba(0,0,0,0.12),0 1px 3px 0 rgba(0,0,0,0.2); граница: нет; цвет границы: #7851A9' , 
+       	},
+        { 
+            название : 'МГ' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4]2.18.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещен MG (MetaGaming) — использование ООС информации, которую Ваш персонаж никак не мог получить в IC-процессе[/SIZE][/FONT][/COLOR][COLOR=rgb (255, 0, 0)][FONT=книга антиква][SIZE=4] | Без звука 30 минут[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              "[СПИСОК]<br>" + 
+              "[*][LEFT][FONT=книга антиква][COLOR=rgb(255, 0, 0)][SIZE=4]Примечание: [/SIZE][/COLOR][COLOR=rgb(209, 213, 216) )][SIZE=4]использование смайлов в виде символов «))», «=D» запрещено в чате IC.[/SIZE][/COLOR][/FONT][/LEFT]<br>" + 
+              "[*][LEFT][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]Примечание: [/SIZE][/FONT][/COLOR][COLOR=rgb(209) , 213, 216)][FONT=book antiqua][SIZE=4] телефонное общение также является IC-чатом.[/SIZE][/FONT][/COLOR][/LEFT]<br>" + 
+              "[/LIST]<br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+        },
+{
+            название : 'КАПС' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.02.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещено использование верхнего регистра (CapsLock) при написании любого текста в любом чате.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4] | Без звука 30 минут[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Наводнение' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.05.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещен флуд — 3 и более повторяющихся сообщений от одного и того же игрока[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0 )][FONT=книга антиква][SIZE=4] | Без звука 30 минут[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Политика' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.18.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещено политическое и религиозное пропагандирование.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT=book antiqua] [SIZE=4] | Отключить звук на 120 минут / Бан на 10 дней[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+{ 
+            название : 'Рынок в ГОСС' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.22.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещено публиковать любые объявления в структурах государственных организаций вне зависимости от чата (IC или OOC).[/SIZE][/FONT][/COLOR][COLOR=rgb(255) , 0, 0)][FONT=книга антиква][SIZE=4] | Без звука 30 минут[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              "[СПИСОК]<br>" + 
+              "[*][LEFT][FONT=книга антиква][COLOR=rgb(255, 0, 0)][SIZE=4]Пример: [/SIZE][/COLOR][COLOR=rgb(209, 213, 216) )][SIZE=4]в помещении центральной больницы написать в чате: «Продам эксклюзивную шапку дешево!!!»[/SIZE][/COLOR][/FONT][/LEFT]<br>» + 
+              "[/LIST]<br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+        },
+          {
+            название : 'Упом род' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Нарушитель буден наказан по следующему пункту правил правил серверов:[/SIZE][/FONT][ /COLOR][/CENTER][/I]<br><br>" + 
+            "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4]2.19.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено оскорбление или дополнительное упоминание родных вне в зависимости от чата (IC или OOC) [/COLOR][COLOR=rgb(255, 0, 0)]| Без звука 120 минут / Бан от 7 до 15 дней[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[СПИСОК]<br><br>' + 
+              "[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4]Примечание:[/COLOR][COLOR=rgb(209, 213, 216)] термин « MQ» расценивается, как упоминание родных.[/SIZE][/COLOR][/FONT][/LEFT]<br>» + 
+              "[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4]Исключение: [/COLOR][COLOR=rgb(209, 213, 216)]если упоминание родных было совершено в процессе ролевой игры и не было обращено к себе в прямом или завуалированном оскорблении.[/SIZE][/COLOR][/FONT][/LEFT]<br>" + 
+              "[/LIST]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/CENTER][/B][/ ЦВЕТ]<br>" , 
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+         {
+            title : 'Упом родной голос' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Нарушитель буден наказан по следующему пункту правил правил серверов:[/SIZE][/FONT][ /COLOR][/CENTER][/I]<br><br>" + 
+            "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.15.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]апрещено оскорблять игроков или родных в голосовом чате [/COLOR][COLOR=rgb(255, 0, 0)]| Без звука 120 минут / Бан 7 - 15 дней[/ РАЗМЕР][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[СПИСОК]<br><br>' + 
+              "[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4]Примечание:[/COLOR][COLOR=rgb(209, 213, 216)] термин « MQ» расценивается, как упоминание родных.[/SIZE][/COLOR][/FONT][/LEFT]<br>» + 
+              "[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4]Исключение: [/COLOR][COLOR=rgb(209, 213, 216)]если упоминание родных было совершено в процессе ролевой игры и не было обращено к себе в прямом или завуалированном оскорблении.[/SIZE][/COLOR][/FONT][/LEFT]<br>" + 
+              "[/LIST]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/CENTER][/B][/ ЦВЕТ]<br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://media.discordapp.net/attachments/1115566790790098944/1115597676717801482/standard_2.gif?width=514&height=66[/img][/ URL][/CENTER]' ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'ООС оск' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.03.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] ЗЛюбые формы оскорблений, издевательств, расизма, церковности, религиозной враждебности, сексизма в OOC чате запрещены[/SIZE][/FONT][/COLOR][COLOR=rgb(255) , 0, 0)][FONT=книга антиква][SIZE=4] | Без звука 30 минут[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            title : 'IC оск (секс. хар-ра)' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Нарушитель буден наказан по следующему пункту правил правил серверов:[/SIZE][/FONT][ /COLOR][/CENTER][/I]<br><br>" + 
+            "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.07.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]апрещены совершенно любые оскорбления или действия, порочащие честь и достоинства, несущие в себе подтекст сексуального характера вне зависимости от чата[/COLOR][COLOR=rgb(255, 0, 0 )]| Без звука 30 минут[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[СПИСОК]<br><br>' + 
+              «[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4]Примечание:[/COLOR][COLOR=rgb(209, 213, 216)] «дырка », «шмара», «ведро», «мадагаскарский присосконог», «свиноногий бандикут», «скорострел» и так далее.[/SIZE][/COLOR][/FONT][/LEFT]<br>» + 
+              "[/LIST]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/CENTER][/B][/ ЦВЕТ]<br>" , 
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Аморал' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Нарушитель буден наказан по следующему пункту правил правил серверов:[/SIZE][/FONT][ /COLOR][/CENTER][/I]<br><br>" + 
+            "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.08.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещена любая форма аморальных действий сексуального характера в сторону игроков[/COLOR][COLOR=rgb(255, 0, 0)]| Тюрьма 30 минут / Предупреждение[/SIZE] [/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[СПИСОК]<br><br>' + 
+              "[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4]Исключение:[/COLOR][COLOR=rgb(209, 213, 216)] обоюдное согласие с обеих сторон.[/SIZE][/COLOR][/FONT][/LEFT]<br>" + 
+              "[/LIST]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/CENTER][/B][/ ЦВЕТ]<br>" , 
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+           {
+            название : 'мат в назв. фам/биз' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.53.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещено сохранять название для внутриигровых ценностей с использованием нецензурной лексики, оскорблений, слов политической или религиозной наклонности.[/SIZE][/FONT][/COLOR][COLOR=rgb( 255, 0, 0)][FONT=book antiqua][SIZE=4] | Бан на 1 день / При повторном нарушении обнуления бизнеса[/SIZE][/FONT][/COLOR][/CENTER]<br><br> " + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            title : 'не по-английски в чате' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.01.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Общепризнанный язык сервера — русский Общение в IC-чатах во всех Ролевых играх обязательно должно проходить исключительно на английском языке[/SIZE][/FONT][/COLOR][COLOR =rgb(255, 0, 0)][FONT=book antiqua][SIZE=4] | Устное замечание / Mute 30 минут[/SIZE][/FONT][/COLOR][/CENTER]<br><br> " + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'неув к адм' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4]2.54.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещено неуважительное обращение, оскорбление, неадекватное поведение, угроза в любых их проявлениях по отношению к администрации[/SIZE][/FONT][/COLOR][COLOR=rgb(255) , 0, 0)][FONT=книга антиква][SIZE=4] | Без звука 180 минут [/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+{
+            название : 'выдача за адм' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.10.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещена выдача себя администратору, если таким образом не сохранилась[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT =книга антиква][SIZE=4] | Бан 7 - 15 + ЧС администрации [/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+{
+            заголовок : 'Оск/обман адм' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ICODE]. [/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Нарушитель буден наказан по следующему пункту правил серверов:[/SIZE][/FONT][/COLOR] [/I]<br><br>" + 
+              "[COLOR=rgb(255, 0, 0)][SIZE=4][FONT=book antiqua]2.32. [/FONT][/SIZE][/COLOR][COLOR=rgb(209, 213, 216)] [SIZE=4][FONT=book antiqua]Запрещено введение в заблуждение, обман, оскорбление, неконструктивная критика администрации на всех ресурсах проекта[/FONT][/SIZE][/COLOR][COLOR=rgb(255, 0, 0) ][SIZE=4][FONT=книга антиква]| Бан 7 - 30 дней / PermBan[/FONT][/SIZE][/COLOR]<br><br>" + 
+              '[СПИСОК]<br><br>' + 
+              "[*][COLOR=rgb(255, 0, 0)][SIZE=4][FONT=book antiqua]Пример: [/FONT][/SIZE][/COLOR][COLOR=rgb(209, 213, 216)][SIZE=4][FONT=book antiqua]подделка доказательств, усиление информации в свою пользу, оскорбление администрации в отчете, обвинение администраторов без доказательств и т.д.[/FONT][/SIZE][/COLOR]< br><br>" + 
+              "[/LIST]<br><br>" + 
+              "[I][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Приятной игры на BLACK RUSSIA [/SIZE][/FONT][/COLOR][COLOR=rgb( 0, 140, 240)][FONT=times new roman][SIZE=4]Ролевая игра[/SIZE][/FONT][/COLOR][COLOR=rgb(0, 140, 240)][FONT=times new roman][SIZE=4].[/SIZE][/FONT][/COLOR][/I]<br><br>" , 
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Введение в заблуждение' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4]2.32.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено введение в заблуждение, обман администрации на всех ресурсах проекта.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)] [FONT=книга антиква][SIZE=4] | Бан 7 - 15 дней[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+                    {
+            title : 'Введение в заблуждения Vip-чат' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель буден наказан по пункту определения правил серверов[/SIZE] [/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=античная книга][SIZE=4][/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216) ][FONT=книга антиква][SIZE=4]Запрещено введение в ознакомление в вип-чате.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT=книга антиква] [SIZE=4] | Пермский бан[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            заголовок : 'ooc угроза' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.37.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещены OOC угрозы, в том числе и завуалированные.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT =book antiqua][SIZE=4] | Без звука 120 минут / Бан на 7 дней[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            заголовок : 'пользование правилами' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.33.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено использовать уязвимости правил.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT=book antiqua][ SIZE=4] | Бан на 15 дней[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            title : 'конфликты ooc и ic' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4]2.35.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]На игровых серверах возможны конфликты IC и OOC на почве разногласия о национальности и/или религии совершенно в любом формате.[/SIZE][/FONT][/COLOR][ COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4] | Отключить звук на 120 минут / Бан на 7 дней[/SIZE][/FONT][/COLOR][/CENTER]<br>< бр>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'переносить конфликты' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4]2.36.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено переносить конфликты из IC в OOC и обратно.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT =книга антиква][SIZE=4] | Предупреждение[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'злоуп нарушениями' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.39.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Злоупотребление нарушениями правилами сервера.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT=book antiqua][ SIZE=4] | Бан от 7 до 30 дней[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+         {
+            название : 'злоуп символами' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Нарушитель буден наказан по следующему пункту правил правил серверов:[/SIZE][/FONT][ /COLOR][/CENTER][/I]<br><br>" + 
+            "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.06.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено злоупотребление знаками препинания и другими символами[/COLOR][COLOR=rgb(255, 0, 0)]| Без звука 30 минут[/SIZE][/FONT][ /COLOR][/CENTER]<br><br>" + 
+              '[СПИСОК]<br><br>' + 
+              «[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4]Исключение:[/COLOR][COLOR=rgb(209, 213, 216)] «? ??????», «!!!!!!!», «Даааааааааааааааааааааа» и так далее.[/SIZE][/COLOR][/FONT][/LEFT]<br>" + 
+              "[/LIST]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/CENTER][/B][/ ЦВЕТ]<br>" , 
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          
+          {
+        title : ' ᅠᅠ.... Наказания по Рекламе .... ' , 
+        dpstyle : 'Освальд: 3px; цвет: #fff; фон: #7851A9; box-shadow: 0 0 2px 0 rgba(0,0,0,0.14),0 2px 2px 0 rgba(0,0,0,0.12),0 1px 3px 0 rgba(0,0,0,0.2); граница: нет; цвет границы: #7851A9' , 
+      	},
+        {
+            название : 'Реклама Голос' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.09.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещена реклама в голосовом чате, не связанная с игровым процессом[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT =книга антиква][SIZE=4] | Бан 7 - 15 дней[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Реклама промо' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.21.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещается реклама промокодов в игре, а также их упоминание в любом виде во всех чатах.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4] | Бан на 30 дней[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              "[СПИСОК]<br>" + 
+              "[*][LEFT][FONT=книга антиква][COLOR=rgb(255, 0, 0)][SIZE=4]Примечание: [/SIZE][/COLOR][COLOR=rgb(209, 213, 216) )][SIZE=4]чаты семейные, строительные компании, региональные компании, фракционные чаты, IC, OOC, VIP и так далее.[/SIZE][/COLOR][/FONT][/LEFT]<br>" + 
+              "[*][LEFT][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]Исключение: [/SIZE][/FONT][/COLOR][COLOR=rgb(209) , 213, 216)][FONT=book antiqua][SIZE=4]промокоды, предоставленные разработчиками, а также распространяемые через официальные ресурсы проекта.[/SIZE][/FONT][/COLOR][/LEFT]<br>" + 
+              "[*][LEFT][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]Пример: [/SIZE][/FONT][/COLOR][COLOR=rgb(209) , 213, 216)][FONT=book antiqua][SIZE=4]если игрок упомянет промокод, распространяйте через официальную публичную страницу ВКонтакте либо через официальный Discord в любом из чатов, эффект ему не выдается.[/SIZE][/FONT] [/LEFT]<br>" + 
+              "[/LIST]<br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Системный промо' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Данный промокод явлется системным, или был выпущен разработчиками[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Реклама' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.31.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено рекламировать на серверах любые проекты, серверы, сайты, сторонние Discord-серверы, каналы YouTube и тому подобное[/SIZE][/FONT][/COLOR][COLOR= rgb(255, 0, 0)][FONT=книга антиква][SIZE=4] | Бан на 7 дней / PermBan[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+           {
+        title : ' ᅠᅠ ..... Наказание за NonRp игры .... ' ,  
+        dpstyle : 'Освальд: 3px; цвет: #fff; фон: #7851A9; box-shadow: 0 0 2px 0 rgba(0,0,0,0.14),0 2px 2px 0 rgba(0,0,0,0.12),0 1px 3px 0 rgba(0,0,0,0.2); граница: нет; цвет границы: #7851A9' , 
+	},
+    {
+            название : 'Нрп Обман' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.05.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещены любые ООС-обманы и их попытки, а также любые IC-обманы с нарушениями правил и логики ролевых игр[/SIZE][/FONT][/COLOR][COLOR=rgb (255, 0, 0)][FONT=книга антиква][SIZE=4] | PermBan[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              "[СПИСОК]<br>" + 
+              "[*][LEFT][FONT=книга антиква][COLOR=rgb(255, 0, 0)][SIZE=4]Примечание: [/SIZE][/COLOR][COLOR=rgb(209, 213, 216) )][SIZE=4]после IC-договоренности получить денежные средства и сразу же выйти из игры с Фоном обмана игрока, или же, договорившись через OOC чат (/n), точно также получить денежные средства и сразу же выйти из игры и тому подобное ситуации[/SIZE][/COLOR][/FONT][/LEFT]<br>" + 
+              "[*][LEFT][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]Примечание: [/SIZE][/FONT][/COLOR][COLOR=rgb(209) , 213, 216)][FONT=book antiqua][SIZE=4] разблокировка игрового аккаунта нарушителя будет возможна только в случае возврата полной суммы причинного ущерба, либо непосредственно самого ущерба, который был украдено (по решению обманутой стороны).[/SIZE ][/COLOR][/FONT][/LEFT]<br>" + 
+              "[/LIST]<br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'злоуп нарушениями' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил ограблений/похищений : [/SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'НРП Врач' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту правил государственных структур::[ /SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]5.01.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено оказание медицинской помощи без ролевых игр отыгровок.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT= книга антиква][SIZE=4] | Предупреждение[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'NRP Cop' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту правил государственных структур:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]6.03.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено оказывать задержание без отыгровки в ролевых играх.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT=book антиква][SIZE=4] | Предупреждение[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'НРП Обыск' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту правил государственных структур::[ /SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]8.06.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено проведение обысков без ролевых игр.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT=book антиква][SIZE=4] | Предупреждение[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'НРП Розыск' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту правил государственных структур:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]6.02.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено выдавать розыск без отыгровки для ролевых игр.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT=book антиква][SIZE=4] | Предупреждение[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            титул : 'НРП В/Ч' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту правилу атаки на Военскую часть: [/SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]За нарушение правил вступления на Военную Часть .[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4] | Тюрьма 30 минут (неRP-информация) / Предупреждение (Для сотрудников ОПГ)[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            титул : 'Н/П/Р/О' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.08.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено писать по своему, не по правилам редактирования..[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][ FONT=книга антиква][SIZE=4] | Без звука 30 минут [/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Nrp Поведение' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Нарушитель буден наказан по следующему пункту правил правил серверов:[/SIZE][/FONT][ /COLOR][/CENTER][/I]<br><br>" + 
+            "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.01.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено поведение, нарушающее нормы процесса Ролевые игры в режиме игры[/COLOR][COLOR=rgb(255, 0, 0)]| Тюремное заключение 30 минут[/SIZE][/ ШРИФТ][/COLOR][/CENTER]<br><br>" + 
+              '[СПИСОК]<br><br>' + 
+              "[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4] Примечание:[/COLOR][COLOR=rgb(209, 213, 216)] ездить на Способы проведения крыш, прогулки или прогулки по столам в казино, целенаправленная провокация со стороны руководителей органов с целью развлечений, целенаправленные воздействия в различных собеседованиях и т. д.[/SIZE][/COLOR][/FONT][/LEFT]<br> " + 
+              "[/LIST]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/CENTER][/B][/ ЦВЕТ]<br>" , 
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Nrp AKC' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Нарушитель буден наказан по следующему пункту правил правил серверов:[/SIZE][/FONT][ /COLOR][/CENTER][/I]<br><br>" + 
+            "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4]2.52.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено расположить аксессуары на теле персонажа, нарушая нормы морали и этики, подключить аксессуары до слишком большого размера.[/COLOR][COLOR=rgb(255, 0, 0)] При первом нарушении - обнуление аксессуаров, при повторном повреждении - обнуление аксессуаров + ТЮРЬМА 30 минут[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[СПИСОК]<br><br>' + 
+              "[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4]Исключение:[/COLOR][COLOR=rgb(209, 213, 216)] слишком большой аксессуары на голове персонажа, имитация гитары на половых органах и тому подобное.[/SIZE][/COLOR][/FONT][/LEFT]<br>" + 
+              "[/LIST]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/CENTER][/B][/ ЦВЕТ]<br>" , 
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          
+           {
+        title : ' ᅠᅠ.... Перенаправление в другой раздел .... ' , 
+        dpstyle : 'Освальд: 3px; цвет: #fff; фон: #7851A9; box-shadow: 0 0 2px 0 rgba(0,0,0,0.14),0 2px 2px 0 rgba(0,0,0,0.12),0 1px 3px 0 rgba(0,0,0,0.2); граница: нет; цвет границы: #7851A9' , 
+	},
+	 {
+            должность : 'Тенхимическому Специалисту' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Ваша жалоба переадресована [/SIZE][/FONT][/I][/COLOR] [COLOR=rgb(255, 102, 0)][I][FONT=times new roman][SIZE=4]Техническому специалисту[/SIZE][/FONT][/COLOR][/CENTER][/I]< br><br>" + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Просьба не создавать дубликаты данных тем, иначе ваш форумный аккаунт может быть заблокирован.[/SIZE] [/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+            '[I][CENTER][SIZE=1][COLOR=rgb(255, 140, 0)][ICODE]На защиту...[/ICODE][/SIZE][/CENTER][/COLOR]' ,
+            префикс : TEX_PREFIX ,
+            статус : правда , 
+          },
+          {
+            звание : 'Главному администратору' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Ваша жалоба переадресована [/SIZE][/FONT][/I][/COLOR] [COLOR=rgb(255, 0, 0)][I][FONT=times new roman][SIZE=4]Главному администратору[/SIZE][/FONT][/COLOR][/CENTER][/I]< br><br>" + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Просьба не создавать дубликаты данных тем, иначе ваш форумный аккаунт может быть заблокирован.[/SIZE] [/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+            '[I][CENTER][SIZE=1][COLOR=rgb(255, 140, 0)][ICODE]На защиту...[/ICODE][/SIZE][/CENTER][/COLOR]' ,
+            префикс : PIN_PREFIX ,
+            статус : правда , 
+          },          
+          {
+            название : 'В жб на адм' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Вы ошиблись разделом, обратитесь в раздел жалобы на администрацию - [ /I][URL='https://forum.blackrussia.online/index.php?forums/Жалобы-на-администрацию.1442/']*Нажмите сюда*[/URL][/SIZE][/FONT][ /COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'В жб на лидеров' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Вы ошиблись разделом, обратились в раздел жалоб на лидеров - [ /I][URL='https://forum.blackrussia.online/index.php?forums/%D0%96%D0%B0%D0%BB%D0%BE%D0%B1%D1%8B-%D0 %BD%D0%B0-%D0%BB%D0%B8%D0%B4%D0%B5%D1%80%D0%BE%D0%B2.351/']*Нажмите сюда*[/URL][/ РАЗМЕР][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'В жб на Хелперов' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Вы ошиблись разделом, обратитесь в раздел жалоб на Агентов поддержки - [/I][URL='https://forum.blackrussia.online/index.php?threads/ekb-Жалобы-на-Агентов-Поддержки.4295218/']*Нажмите сюда*[/URL][/SIZE] [/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            title : 'В жб на сотрудников орг' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Вы ошиблись разделом, обратитесь к жалобам сотрудников отдельных компаний[/ РАЗМЕР][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            title : 'В обжалования наказания' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Вы ошиблись разделом, обратитесь в раздел Обжалование наказаний - [/ I][URL='https://forum.blackrussia.online/index.php?forums/%D0%96%D0%B0%D0%BB%D0%BE%D0%B1%D1%8B-%D0% BD%D0%B0-%D0%BB%D0%B8%D0%B4%D0%B5%D1%80%D0%BE%D0%B2.351/']*Нажмите сюда*[/URL][/SIZE ][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          
+           {
+        title : ' ᅠᅠ.... Доказательства в жалобах .... ' , 
+        dpstyle : 'Освальд: 3px; цвет: #fff; фон: #7851A9; box-shadow: 0 0 2px 0 rgba(0,0,0,0.14),0 2px 2px 0 rgba(0,0,0,0.12),0 1px 3px 0 rgba(0,0,0,0.2); граница: нет; цвет границы: #7851A9' , 
+	},
+    {
+            заголовок : 'Недостаточно док-в' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              «[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Недостаточно доказательство для корректного просмотра ваших жалоб.[/SIZE] [/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            заголовок : 'Отсутствуют док-ва' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Отсутствуют доказательства - следовательно, рассмотрение не требуется. Загрузите доказательства на фото-видео хостинги YouTube, Imgur, Yapx и так далее.[/SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            title : 'Не работает док-ва' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Ваши доказательства не рабочие или же битая ссылка.[/SIZE ][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Док-ва обрываются' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Ваша видеозапись обрывается. Загрузите полную видеозапись на видео-хостинг YouTube .[/SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Док-ва отредакт' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Доказательства соответствия документации редактированию - следовательно, к рассмотрению не предъявляются.[ /SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Док-ва обрываются' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Ваша видеозапись обрывается. Загрузите полную видеозапись на видео-хостинг YouTube .[/SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Нужен фрапс' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]В данной ситуации обязательно должен быть фрапс (видео фиксация) всех моментов .[/SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Док-ва в соц. сети' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4] Доказательства в соц. сетях не принимаются. Загрузите доказательства на фото -видео хостинги YouTube, Imgur, Yapx и так далее.[/SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Неполный фрапс' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Видеофиксация не полная либо же нет условий транзакции.[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            title : 'Нету времени' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]В доказательствах отсутствуют дата и время[/SIZE][/ ШРИФТ][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            title : 'Отсутствуют таймкоды' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Ваша жалоба отклонена, т.к в ней нет таймкодов. Если видео длится больше 3-х минут - Вы должны указать таймкоды разнообразия.[/SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            title : 'Нет условий сделки' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]В предоставленных документах отсутствуют условия транзакции.[/SIZE][ /FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Нарушений нет' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушений со стороны игрока не было замечено. [/SIZE] [/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          
+           {
+        title : ' ᅠᅠ.... Прочие пункты правиал.... ' , 
+        dpstyle : 'Освальд: 3px; цвет: #fff; фон: #7851A9; box-shadow: 0 0 2px 0 rgba(0,0,0,0.14),0 2px 2px 0 rgba(0,0,0,0.12),0 1px 3px 0 rgba(0,0,0,0.2); граница: нет; цвет границы: #7851A9' , 
+	},
+	{
+            title : 'Помеха Rp процессу' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.04.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4] Запрещены любые действия, способные привести к помехам в игровом процессе, а также выполнению работ, если они этого не предусматривают, и если эти действия осуществляются за рамки игрового процесса данной работы.[/SIZE ][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4] | Бан на 10 дней / Обнуление аккаунта (при повторном нарушении)[/SIZE][/ ШРИФТ][/COLOR][/CENTER]<br><br>" + 
+              "[СПИСОК]<br>" + 
+              "[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4]Пример: [/SIZE][/COLOR][COLOR=rgb(209, 213, 216) )][SIZE=4]таран дальнобойщиков, инкссаторов под разными предлогами.[/SIZE][/COLOR][/FONT][/LEFT]<br>" + 
+              "[/LIST]<br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+    {
+            название : 'Уход от Рп' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Нарушитель буден наказан по следующему пункту правил правил серверов:[/SIZE][/FONT][ /COLOR][/CENTER][/I]<br><br>" + 
+            "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.02.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено целенаправленно уходить от процесса ролевой игры всеми разными способами.[/COLOR][COLOR=rgb(255, 0, 0)]| Тюрьма 30 минут / Предупреждение[/SIZE] [/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[СПИСОК]<br><br>' + 
+              "[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4]Пример:[/COLOR][COLOR=rgb(209, 213, 216)] уходить в АФК при остановке транспортных средств последующими мерами, выход из игры для избегания смерти, выход из игры во время задержания/ареста, полное игнорирование отыгровок другого игрока, который так или иначе может коснуться вашего персонажа и так далее..[/SIZE][/ ЦВЕТ][/FONT][/LEFT]<br>" + 
+              "[/LIST]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/CENTER][/B][/ ЦВЕТ]<br>" , 
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Багуз' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.21.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено пытаться обходить игровую систему или использовать любые баги сервера[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][FONT =книга антиква][SIZE=4] | Бан 15 - 30 дней / ПермскийБан[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Bagouse Anim' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+            "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][SIZE=4]Нарушитель буден наказан по следующему пункту правил правил серверов:[/SIZE][/FONT][ /COLOR][/CENTER][/I]<br><br>" + 
+            "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.55.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещается багоюз связанный с анимацией в проявлениях любых [/COLOR][COLOR=rgb(255, 0, 0)]| Тюрьма 60 / 120 минут[/SIZE][ /FONT][/COLOR][/CENTER]<br><br>" + 
+              '[СПИСОК]<br><br>' + 
+              "[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4]Пример:[/COLOR][COLOR=rgb(209, 213, 216)] если игрок , с помощью бага, устанавливает ограничение на использование оружия в зеленой зоне, устанавливает темп стрельбы, либо быстро перемещается во время войны для бизнеса, либо во время перестрелки на мероприятии с семейными контейнерами, после чего в виде тюрьмы применяется 120 минут. когда по ошибке было получено преимущество перед другими игроками[/SIZE][/COLOR][/FONT][/LEFT]<br>" + 
+              "[*][LEFT][FONT=book antiqua][COLOR=rgb(255, 0, 0)][SIZE=4]Пример: [/COLOR][COLOR=rgb(209, 213, 216)] если игрок использует баги, связанные с анимацией, и при этом не влияет на игровой процесс других игроков, а также не получает преимущества перед другими игроками, последует эффект в видео Jail на 60 минут.[/SIZE][/COLOR][/FONT][/ ВЛЕВО]<br>" + 
+              "[/LIST]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/CENTER][/B][/ ЦВЕТ]<br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://media.discordapp.net/attachments/1115566790790098944/1115597676717801482/standard_2.gif?width=514&height=66[/img][/ URL][/CENTER]' ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Заголовок неправильный' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Ваш заголовок составлен не по форме. Внимательно прочтите правила создания тем , прикрепленные в этом разделе.[/SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            титул : 'Фейк' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4]4.10.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено создавать никнейм, повторяющий или похожий на периодические никнеймы игроков или администраторов по их написанию[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0) , 0)][FONT=book antiqua][SIZE=4] | Устное замечание + смена игрового никнейма / PermBan[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            Название : '2 и более игрока' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Ваша жалоба отклонена по причине: нельзя написать одну жалобу на двух и более игроков (на каждого игрока отдельная жалоба)[/SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Не по форме' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Ваша жалоба составлена ​​не по форме. Внимательно прочитайте правила подачи жалоб. для игроков, прикрепленные в этом разделе.[/SIZE][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Уже наказан' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Данный нарушитель уже был наказан ранее.[/SIZE][ /FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            title : 'Уже был дан ответ' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Вам уже был дан ответ в предыдущих жалобах[/SIZE] [/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Прошло 3 дня' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]С моментами нарушения прошло более 72-х часов[/SIZE ][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            title : 'От 3 лиц' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman] [SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{ user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Ваша жалоба написана от 3-его лица. Отказано[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : UNACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Слив Глобального чата' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]3.08.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещены любые формы «слива» путём использования слишком чатов.[/SIZE][/FONT][/COLOR][COLOR=rgb(255, 0, 0)][ FONT=книга антиква][SIZE=4] | PermBan[/SIZE][/FONT][/COLOR][/CENTER]<br><br>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+          {
+            название : 'Слив склада' , 
+            dpstyle : 'радиус границы: 13 пикселей; поле справа: 5 пикселей; граница: сплошная 2 пикселя; цвет границы: rgb(236, 124, 38, 0.5)' , 
+            содержание :
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/vZ2f6V91/2.png[/img][/url][/CENTER]<br>' + 
+            '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/mrhcH5vR/1621526767066.png[/img][/url][/CENTER]<br>' + 
+            '[COLOR=rgb(0, 255, 127)][FONT=times new roman][SIZE=4][I][CENTER][ICODE]{{приветствие }}, уважаемый {{user.name }}[/ ICODE].[/CENTER][/I][/SIZE][/FONT][/COLOR]<br><br>' + 
+              "[I][CENTER][COLOR=rgb(209, 213, 216)][FONT=times new roman][FONT=times new roman][SIZE=4]Нарушитель будет наказан по следующему пункту определения правил серверов:[/ РАЗМЕР][/FONT][/COLOR][/CENTER][/I]<br><br>" + 
+              "[CENTER][COLOR=rgb(255, 0, 0)][FONT=book antiqua][SIZE=4]2.09.[/SIZE][/FONT][/COLOR][COLOR=rgb(209, 213, 216)][FONT=book antiqua][SIZE=4]Запрещено сливать распределение групп / семьи путем взятия большого количества ресурсов, или же брать больше, чем удалось решить на самом деле.[/SIZE][/FONT][/COLOR][ COLOR=rgb(255, 0, 0)][FONT=книга антиква][SIZE=4] | Бан 15 - 30 дней / PermBan[/SIZE][/FONT][/COLOR][/CENTER]<br>< бр>" + 
+              '[CENTER][url=https://postimages.org/][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/url][/CENTER]<br>' + 
+              "[I][CENTER][SIZE=1][COLOR=rgb(255, 255, 255)]Приятной игры на[/COLOR][COLOR=rgb(255, 0, 0)][B] BLACK RUSSIA[/ B][/COLOR] [/SIZE][/I][COLOR=rgb(255, 165, 0)][B][SIZE=1]Ролевая игра[/SIZE][/B][/COLOR]" ,
+            префикс : ACCEPT_PREFIX ,
+            статус : ложь , 
+          },
+      
+      	];
+ 
+	$ ( документ ). готов (() => {  
+	// Загрузка скрипта для обработки шаблонов
+	$ ( «тело» ). добавить ( '<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>' );
+ 
+	// Добавление кнопок при включении страницы
+	addButton ( 'На рассмотрении' , 'pin' , 'border-radius: 13px;margin-right: 5px; border: 2px сплошной; border-color: rgb(203, 40, 33, 0.5);' );  
+    addButton ( 'Отказано' , 'unaccept' , 'border-radius: 13px; Margin-right: 5px; border: 2px Solid; border-color: rgb(255, 36, 0, 0.5);' )  
+    addButton ( 'Одобрено' , 'принято' , 'border-radius: 13px;margin-right: 5px; border: 2px сплошной; border-color: rgb(152, 251, 152, 0.5);' )  
+	addButton ( 'Закрыто' , 'закрыто' , 'border-radius: 13px;margin-right: 5px; border: 2px сплошной; border-color: rgb(138, 43, 226, 0.5);' );  
+	добавитьОтветы ();
+	
+	// Поиск информации по теме
+	const threadData = getThreadData ();
+ 
+	$ (` кнопка # ff` ). щелкните (() => PasteContent ( 8 , threadData , true ));  
+	$ (` кнопка # prr` ). щелкните (() => PasteContent ( 2 , threadData , true ));  
+	$ (` кнопка # жб` ). нажмите (() => PasteContent ( 21 , threadData , true ));  
+	$ ( 'кнопка#непринять' ). нажмите (() => editThreadData ( UNACCEPT_PREFIX , false ));  
+	$ ( 'кнопка#принято' ). нажмите (() => editThreadData ( AC С EPT_PREFIX , false ));  
+	$ ( 'кнопка#контакт' ). щелкните (() => editThreadData ( PIN_PREFIX , true ));  
+	$ ( 'кнопка#teamProject' ). щелкните (() => editThreadData ( COMMAND_PREFIX , true ));  
+	$ ( 'кнопка#просмотрено' ). щелкните (() => editThreadData ( WATCHED_PREFIX , false ));  
+	$ ( 'кнопка#решено' ). нажмите (() => editThreadData ( DECIDED_PREFIX , false ));  
+	$ ( 'кнопка#закрыто' ). щелкните (() => editThreadData ( CLOSE_PREFIX , false ));  
+	$ ( 'кнопка#закрытая_жалоба' ). щелкните (() => editThreadData ( CLOSE_PREFIX , false , false ));   
+	$ ( 'кнопка#техническая спецификация' ). щелкните (() => editThreadData ( TEX_PREFIX , true ));  
+ 
+	$ (` кнопка # selectAnswer` ). нажмите (() => {  
+	ХФ . alert ( buttonsMarkup ( buttons ), null , 'ВЫБЕРИТЕ ОТВЕТ' );  
+	кнопки . forEach (( btn , id ) => {  
+	если ( идентификатор > 1 ) {   
+	$ (` кнопка # отвечает - $ { id }`). щелкните (() => PasteContent ( id , threadData , true ));  
+	}
+	еще { 
+	$ (` кнопка # отвечает - $ { id }`). нажмите (() => PasteContent ( id , threadData , false ));  
+	}
+	});
+	});
+	});
+ 
+    функция addButton ( имя , идентификатор , стиль ) { 
+         $ ( '.button--icon--reply' ). до (
+	`< button type = "button" class = "button--primary button rippleButton" id = "${id}" style = "${style}" > $ { name </ button >`, 
+	);
+	}
+	функция addAnswers () { 
+		$ ( '.button--icon--reply' ). after (`< button type = "button" class = "button--cta uix_quickReply--button button button--icon button--icon-write rippleButton" id = "selectAnswer" style = "oswald: 3px; Margin-left : 5px; border-top: 10px; border-radius: 13px;" >ОТВЕТЫ</ button >`, 
+	);
+	}
+ 
+	функциональные кнопкиРазметка ( кнопки ) { 
+	return `< div class = "select_answer" > $ { button 
+	. карта (
+	( кнопка , я ) => 
+	`< button id = "ответы-${i}" class = " button -- основная кнопка ` +  
+	` rippleButton "style=" поля : 4px ; $ { батн . dpstyle } "><span class=" button - text "> $ { btn . title </span> </ button >`,
+	)
+	. присоединиться ( '' )</ div >`;
+	}
+ 
+	функция PasteContent ( id , данные = {}, отправить = ложь ) {   
+	константный шаблон = Руль . скомпилировать ( кнопки [ id ] .content ); 
+	if ( $ ( '.fr-element.fr-view p' ). text () === '' ) $ ( '.fr-element.fr-view p' ). пустой ();   
+ 
+	$ ( 'span.fr-placeholder' ). пустой ();
+	$ ( 'div.fr-element.fr-view p' ). добавить ( шаблон ( данные ));
+	$ ( 'a.overlay-titleCloser' ). триггер ( «щелчок» );
+ 
+	если ( отправить == правда ) {   
+	editThreadData ( кнопки [ id ].prefix , кнопки [ id ] .status ) ;
+	$ ( '.button--icon.button--icon--reply.rippleButton' ). триггер ( «щелчок» );
+	}
+	}
+ 
+	функция getThreadData () { 
+	constauthorID = $ ( 'a.username' ) [ 0 ]. атрибуты [ 'идентификатор-пользователя-данных' ]. значение узла ;
+	constauthorName = $ ( 'a.username' ) . HTML ();
+	константные часы = новая дата (). Получить часы ();  
+	возвращаться { 
+	пользователь : { 
+	идентификатор : идентификатор автора ,
+	имя : Имя автора ,
+	упоминание : `[ USER = $ { authorID }] $ { authorName }[/ USER ]`, 
+	},
+	приветствие : () =>  
+	4 < часы && часы <= 11 ?   
+	'Доброе утро' : 
+	11 < часов && часов <= 15 ?   
+	'Добрый день' : 
+	15 < часы && часы <= 21 ?   
+	'Добрый вечер' : 
+	'Доброй ночи' ,
+	};
+	}
+          функция editThreadData ( префикс , вывод = false ) {  
+          // Получаем заголовок темы, так как он необходим при запросе
+            const threadTitle = $ ( '.p-title-value' )[ 0 ]. последний ребенок . текстСодержимое ;
+           
+            если ( штифт == ложь ) { 
+              выборка (` $ { документ . URL } редактировать `, { 
+                метод : 'POST' , 
+                тело : getFormData ({
+                prefix_id : префикс ,
+                заголовок : ThreadTitle ,
+                _xfToken : XF . конфигурация . csrf ,
+                _xfRequestUri : документ . URL-адрес . раскол ( XF . config . url.fullBase ) [ 1 ] ,
+                _xfWithData : 1 , 
+                _xfResponseType : 'json' , 
+                }),
+              }). затем (() => location . reload ()); 
+            }
+            если ( контактный == верно ) { 
+              выборка (` $ { документ . URL } редактировать `, { 
+                метод : 'POST' , 
+                тело : getFormData ({
+                prefix_id : префикс ,
+                заголовок : ThreadTitle ,
+                липкий : 1 , 
+                _xfToken : XF . конфигурация . csrf ,
+                _xfRequestUri : документ . URL-адрес . раскол ( XF . config . url.fullBase ) [ 1 ] ,
+                _xfWithData : 1 , 
+                _xfResponseType : 'json' , 
+                }),
+              }). затем (() => location . reload ()); 
+            }
+          }
+           
+          функция getFormData ( данные ) { 
+            const formData = новые FormData ();  
+            Объект . записи ( данные ). forEach ( я => formData.добавление ( я [ 0 ] , я [ 1 ] ));
+            вернуть данные формы ;
+            }
+          })();
